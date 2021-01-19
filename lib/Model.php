@@ -712,6 +712,16 @@ class Model
 	}
 
 	/**
+	 * Modifies this model's internal state, changing whether it is seen as a new record or not.
+	 *
+	 * @param bool $new_record True to flag as new record (insert mode); false to flag as existing record (update mode).
+	 */
+	public function set_is_new_record(bool $new_record): void
+	{
+		$this->__new_record = $new_record;
+	}
+
+	/**
 	 * Throws an exception if this model is set to readonly.
 	 *
 	 * @throws \ActiveRecord\ReadOnlyException

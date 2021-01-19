@@ -29,7 +29,7 @@ Because we do not actively maintain tags or versions for this project, you shoul
 
 ### Fixes
 
-- Compatibility with PHP 7.2+ (DateTime).
+- Compatibility with PHP 7.2+ (DateTime) and PHP 8.0+ (fix deprecated behavior).
 - `activerecord_autoload` no longer causes conflicts when the library is loaded more than once.
 - Fix `count(): Parameter must be an array or an object that implements Countable` error in `find_by_pk()`.
 - Fix `castIntegerSafely()` throwing an error if the input is empty (e.g. empty string), now just returns zero.
@@ -37,6 +37,7 @@ Because we do not actively maintain tags or versions for this project, you shoul
 ### Enhancements
 
 - DateTime: Implement \JsonSerializable, format in "c" mode.
+- Added `set_is_new_record(bool)` to `Model` to help modifying internal state.
 - Added experimental `reconnect()` function to `Connection`.
 - Added `stupidfastquery($options)`: this converts options to a query and returns the raw PDO result set without any activerecord magic.
 - Added `stupidfastqueryValues($options, $colIndex = 0)`: runs a `stupidfastquery` and returns an array of column values.
