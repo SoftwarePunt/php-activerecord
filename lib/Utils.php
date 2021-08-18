@@ -173,7 +173,13 @@ class Utils
 		return is_array(end($options)) ? end($options) : array();
 	}
 
-	public static function add_condition(&$conditions=array(), $condition, $conjuction='AND')
+	/**
+	 * @param array $conditions
+	 * @param array|string $condition
+	 * @param string $conjuction
+	 * @return array|mixed
+	 */
+	public static function add_condition(array &$conditions, $condition, $conjuction='AND')
 	{
 		if (is_array($condition))
 		{
