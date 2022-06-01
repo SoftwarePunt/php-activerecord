@@ -6,9 +6,9 @@
 
 **⚠ `php-activerecord` is no longer actively being maintained, the original site is dead, and the project is mostly abandoned.**
 
-I would not recommend this ORM for any new projects or developments.
+I would ___not___ recommend this ORM for any new projects or developments.
 
-This fork contains some quality-of-life enhancements and fixes that are relevant to us and some of our older projects.
+This fork contains some quality-of-life enhancements, support for the latest PHP version, and fixes, which are relevant to us and some of our older projects that we maintain.
 
 ## Installation
 
@@ -27,9 +27,11 @@ Because we do not actively maintain tags or versions for this project, you shoul
 
 ## Fork changes
 
+**This fork is currently only compatible with PHP 8.1!**
+
 ### Fixes
 
-- Compatibility with PHP 7.2+ (DateTime) and PHP 8.0+ (fix deprecated behavior).
+- Compatibility fixes over time for PHP 7.2, 8.0, 8.1
 - `activerecord_autoload` no longer causes conflicts when the library is loaded more than once.
 - Fix `count(): Parameter must be an array or an object that implements Countable` error in `find_by_pk()`.
 - Fix `castIntegerSafely()` throwing an error if the input is empty (e.g. empty string), now just returns zero.
