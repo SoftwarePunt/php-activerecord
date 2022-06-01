@@ -46,6 +46,9 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_equals("abcd", Cache::$adapter->read("1337"));
 	}
 
+	/**
+	 * @doesNotPerformAssertions
+	 */
 	public function test_get_does_not_execute_closure_on_cache_hit()
 	{
 		$this->cache_get();
@@ -79,12 +82,10 @@ class CacheTest extends SnakeCase_PHPUnit_Framework_TestCase
 		$this->assert_same("abcd", Cache::$adapter->read("myapp::1337"));
 	}
 
-	/**
-	 * @expectedException ActiveRecord\CacheException
-	 * @expectedExceptionMessage Connection refused
-	 */
 	public function test_exception_when_connect_fails()
 	{
+		$this->expectException(\ActiveRecord\CacheException::class);
+		$this->expectExceptionMessage('Connection refused');
 		Cache::initialize('memcache://127.0.0.1:1234');
 	}
 }
