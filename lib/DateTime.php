@@ -2,6 +2,7 @@
 /**
  * @package ActiveRecord
  */
+
 namespace ActiveRecord;
 
 /**
@@ -44,80 +45,36 @@ class DateTime extends \DateTime implements DateTimeInterface, \JsonSerializable
 	 * Pre-defined format strings.
 	 */
 	public static $FORMATS = array(
-		'db'      => 'Y-m-d H:i:s',
-		'number'  => 'YmdHis',
-		'time'    => 'H:i',
-		'short'   => 'd M H:i',
-		'long'    => 'F d, Y H:i',
-		'atom'    => \DateTime::ATOM,
-		'cookie'  => \DateTime::COOKIE,
+		'db' => 'Y-m-d H:i:s',
+		'number' => 'YmdHis',
+		'time' => 'H:i',
+		'short' => 'd M H:i',
+		'long' => 'F d, Y H:i',
+		'atom' => \DateTime::ATOM,
+		'cookie' => \DateTime::COOKIE,
 		'iso8601' => \DateTime::ISO8601,
-		'rfc822'  => \DateTime::RFC822,
-		'rfc850'  => \DateTime::RFC850,
+		'rfc822' => \DateTime::RFC822,
+		'rfc850' => \DateTime::RFC850,
 		'rfc1036' => \DateTime::RFC1036,
 		'rfc1123' => \DateTime::RFC1123,
 		'rfc2822' => \DateTime::RFC2822,
 		'rfc3339' => \DateTime::RFC3339,
-		'rss'     => \DateTime::RSS,
-		'w3c'     => \DateTime::W3C);
+		'rss' => \DateTime::RSS,
+		'w3c' => \DateTime::W3C);
 
 	private $model;
 	private $attribute_name;
 
-	public function attribute_of($model, $attribute_name)
+	// -----------------------------------------------------------------------------------------------------------------
+	// Implementation overrides
+
+	public function add($interval): \DateTime
 	{
-		$this->model = $model;
-		$this->attribute_name = $attribute_name;
+		$this->flag_dirty();
+		return parent::add($interval);
 	}
 
-	/**
-	 * Formats the DateTime to the specified format.
-	 *
-	 * <code>
-	 * $datetime->format();         # uses the format defined in DateTime::$DEFAULT_FORMAT
-	 * $datetime->format('short');  # d M H:i
-	 * $datetime->format('Y-m-d');  # Y-m-d
-	 * </code>
-	 *
-	 * @see FORMATS
-	 * @see get_format
-	 * @param string $format A format string accepted by get_format()
-	 * @return string formatted date and time string
-	 */
-	public function format($format=null)
-	{
-		return parent::format(self::get_format($format));
-	}
-
-	/**
-	 * Returns the format string.
-	 *
-	 * If $format is a pre-defined format in $FORMATS it will return that otherwise
-	 * it will assume $format is a format string itself.
-	 *
-	 * @see FORMATS
-	 * @param string $format A pre-defined string format or a raw format string
-	 * @return string a format string
-	 */
-	public static function get_format($format=null)
-	{
-		// use default format if no format specified
-		if (!$format)
-			$format = self::$DEFAULT_FORMAT;
-
-		// format is a friendly
-		if (array_key_exists($format, self::$FORMATS))
-			 return self::$FORMATS[$format];
-
-		// raw format
-		return $format;
-	}
-
-	/**
-	 * This needs to be overriden so it returns an instance of this class instead of PHP's \DateTime.
-	 * See http://php.net/manual/en/datetime.createfromformat.php
-	 */
-	public static function createFromFormat($format, $time, $tz = null)
+	public static function createFromFormat($format, $time, $tz = null): \DateTime|false
 	{
 		$phpDate = $tz ? parent::createFromFormat($format, $time, $tz) : parent::createFromFormat($format, $time);
 		if (!$phpDate)
@@ -128,31 +85,92 @@ class DateTime extends \DateTime implements DateTimeInterface, \JsonSerializable
 		return $ourDate;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public function jsonSerialize()
+	// createFromImmutable
+
+	// createFromInterface
+
+	// getLastErrors
+
+	public function modify($modify): \DateTime
 	{
-		return $this->format("c");
+		$this->flag_dirty();
+		return parent::modify($modify);
 	}
 
-	public function __toString()
+	// __set_state
+
+	public function setDate($year, $month, $day): \DateTime
 	{
-		return $this->format();
+		$this->flag_dirty();
+		return parent::setDate($year, $month, $day);
 	}
 
-	/**
-	 * Handle PHP object `clone`.
-	 *
-	 * This makes sure that the object doesn't still flag an attached model as
-	 * dirty after cloning the DateTime object and making modifications to it.
-	 *
-	 * @return void
-	 */
-	public function __clone()
+	public function setISODate($year, $week, $day = 1): \DateTime
 	{
-		$this->model = null;
-		$this->attribute_name = null;
+		$this->flag_dirty();
+		return parent::setISODate($year, $week, $day);
+	}
+
+	public function setTime($hour, $minute, $second = NULL, $microseconds = NULL): \DateTime
+	{
+		$this->flag_dirty();
+		return parent::setTime($hour, $minute, $second, $microseconds);
+	}
+
+	public function setTimestamp($unixtimestamp): \DateTime
+	{
+		$this->flag_dirty();
+		return parent::setTimestamp($unixtimestamp);
+	}
+
+	public function setTimezone($timezone): \DateTime
+	{
+		$this->flag_dirty();
+		return parent::setTimezone($timezone);
+	}
+
+	public function sub($interval): \DateTime
+	{
+		$this->flag_dirty();
+		return parent::sub($interval);
+	}
+
+	// diff
+
+	public function format($format = null): string
+	{
+		return parent::format(self::get_format($format));
+	}
+
+	// getOffset
+
+	// getTimestamp
+
+	// getTimezone
+
+	// __wakeUp
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Activerecord extensions
+
+	public static function get_format($format = null)
+	{
+		// use default format if no format specified
+		if (!$format)
+			$format = self::$DEFAULT_FORMAT;
+
+		// format is a friendly
+		if (array_key_exists($format, self::$FORMATS))
+			return self::$FORMATS[$format];
+
+		// raw format
+		return $format;
+	}
+
+	public function attribute_of($model, $attribute_name)
+	{
+		$this->model = $model;
+		$this->attribute_name = $attribute_name;
 	}
 
 	private function flag_dirty()
@@ -161,52 +179,22 @@ class DateTime extends \DateTime implements DateTimeInterface, \JsonSerializable
 			$this->model->flag_dirty($this->attribute_name);
 	}
 
-	public function setDate($year, $month, $day)
+	public function __toString()
 	{
-		$this->flag_dirty();
-		return parent::setDate($year, $month, $day);
+		return $this->format();
 	}
 
-	public function setISODate($year, $week , $day = 1)
+	public function __clone()
 	{
-		$this->flag_dirty();
-		return parent::setISODate($year, $week, $day);
+		$this->model = null;
+		$this->attribute_name = null;
 	}
 
-	public function setTime($hour, $minute, $second = NULL, $microseconds = NULL)
-	{
-		$this->flag_dirty();
-		return parent::setTime($hour, $minute, $second, $microseconds);
-	}
+	// -----------------------------------------------------------------------------------------------------------------
+	// JsonSerializable
 
-	public function setTimestamp($unixtimestamp)
+	public function jsonSerialize(): mixed
 	{
-		$this->flag_dirty();
-		return parent::setTimestamp($unixtimestamp);
+		return $this->format("c");
 	}
-
-	public function setTimezone($timezone)
-	{
-		$this->flag_dirty();
-		return parent::setTimezone($timezone);
-	}
-
-	public function modify($modify)
-	{
-		$this->flag_dirty();
-		return parent::modify($modify);
-	}
-
-	public function add($interval)
-	{
-		$this->flag_dirty();
-		return parent::add($interval);
-	}
-
-	public function sub($interval)
-	{
-		$this->flag_dirty();
-		return parent::sub($interval);
-	}
-
 }
