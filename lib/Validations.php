@@ -517,7 +517,7 @@ class Validations
 						$message = $options['message'];
 					else
 						$message = $options[$messageOptions[$range_option]];
-					
+
 
 					$message = str_replace('%d', $option, $message);
 					$attribute_value = $this->model->$attribute;
@@ -904,7 +904,7 @@ class Errors implements IteratorAggregate
 	 *
 	 * @return ArrayIterator
 	 */
-	public function getIterator()
+	public function getIterator(): ArrayIterator
 	{
 		return new ArrayIterator($this->full_messages());
 	}
