@@ -283,7 +283,7 @@ abstract class AbstractRelationship implements InterfaceRelationship
 
 	protected function set_class_name($class_name)
 	{
-		if (!has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
+		if (!class_exists($class_name) && !has_absolute_namespace($class_name) && isset($this->options['namespace'])) {
 			$class_name = $this->options['namespace'].'\\'.$class_name;
 		}
 
