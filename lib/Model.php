@@ -684,7 +684,7 @@ class Model
 	{
 		if ($delegate && is_array($delegate)) {
 			if ($delegate['prefix'] != '')
-				$name = substr($name,strlen($delegate['prefix'])+1);
+				$name = substr($name,strlen($delegate['prefix'] ?? '') + 1);
 
 			if (in_array($name,$delegate['delegate']))
 				return $name;
