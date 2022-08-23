@@ -226,7 +226,7 @@ class Utils
 
 	public static function is_blank($var)
 	{
-		return 0 === strlen($var);
+		return 0 === strlen($var ?? '');
 	}
 
 	private static $plural = array(
