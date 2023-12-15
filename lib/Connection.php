@@ -123,6 +123,9 @@ abstract class Connection
 		$fqclass = static::load_adapter_class($info->protocol);
 
 		try {
+			/**
+			 * @var $connection Connection
+			 */
 			$connection = new $fqclass($info);
 			$connection->protocol = $info->protocol;
 			$connection->logging = $config->get_logging();
@@ -273,7 +276,10 @@ abstract class Connection
 
     public function reconnect()
     {
+		$isReconnecting = false;
+
         if ($this->connection) {
+			$isReconnecting = true;
             $this->disconnect();
         }
 
@@ -291,6 +297,11 @@ abstract class Connection
         }
 
         $this->connection = new PDO("$info->protocol:$host;dbname=$info->db", $info->user, $info->pass, static::$PDO_OPTIONS);
+
+		if ($isReconnecting && isset($info->charset)) {
+			// Reconnecting: call "SET NAMES" or equivalent again
+			$this->set_encoding($info->charset);
+		}
     }
 
 	/**
