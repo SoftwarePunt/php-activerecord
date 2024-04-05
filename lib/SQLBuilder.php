@@ -19,9 +19,9 @@ class SQLBuilder
 	private $order;
 	private $limit;
 	private $offset;
-	private $group;
-	private $having;
-	private $update;
+	private $group = '';
+	private $having = '';
+	private $update = '';
 
 	// for where
 	private $where;
