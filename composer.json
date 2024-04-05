@@ -6,8 +6,7 @@
     "homepage": "http://www.phpactiverecord.org/",
     "license": "MIT",
     "require": {
-      "php": ">=7.2.0",
-        "phpunit/phpunit": "^9.5"
+      "php": ">=7.2.0"
     },
     "suggest": {
       "maximebf/debugbar": "This package can intergrate into the PHP Debugbar"
@@ -17,7 +16,8 @@
     },
     "require-dev": {
         "pear/pear_exception": "1.0-beta1",
-        "pear/log": "~1.12"
+        "pear/log": "~1.12",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "files": [ "ActiveRecord.php" ]
