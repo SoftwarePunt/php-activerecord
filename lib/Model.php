@@ -547,12 +547,23 @@ class Model
 	 *
 	 * @param string $name Attribute name
 	 */
-	public function flag_dirty($name)
+	public function flag_dirty(string $name): void
 	{
 		if (!$this->__dirty)
 			$this->__dirty = array();
 
 		$this->__dirty[$name] = true;
+	}
+
+	/**
+	 * Removes attribute dirty flag.
+	 *
+	 * @param string $name Attribute name
+	 */
+	public function unflag_dirty(string $name): void
+	{
+		if ($this->__dirty && isset($this->__dirty[$name]))
+			unset($this->__dirty[$name]);
 	}
 
 	/**
