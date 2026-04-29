@@ -851,9 +851,6 @@ class Model
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
 
-        var_dump($this->dirty_attributes());
-        var_dump($attributes); exit;
-
 		$pk = $this->get_primary_key(true);
 		$use_sequence = false;
 
