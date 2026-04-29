@@ -40,12 +40,13 @@ Because we do not actively maintain tags or versions for this project, you shoul
 
 - DateTime: Implement \JsonSerializable, format in "c" mode.
 - Added `set_is_new_record(bool)` to `Model` to help modifying internal state.
+- Added `flag_all_dirty()` to `Model`.
 - Added experimental `reconnect()` function to `Connection`.
 - Added `stupidfastquery($options)`: this converts options to a query and returns the raw PDO result set without any activerecord magic.
 - Added `stupidfastqueryValues($options, $colIndex = 0)`: runs a `stupidfastquery` and returns an array of column values.
 - Added `stupidfastcount($options)`: run query, only return row count. 
 - Added `find_all_with_wrapped_sort($options)`: this wraps the results in a separate SELECT for faster sorting on JOIN heavy queries.
-- Pass `query_info` to `find($options)` options to get generated query data as result (used internally by `stupidfastcount` & co) - can be used if you want to convert `$options` to an actual statement: 
+- Pass `query_info` to `find($options)` options to get generated query data as result (used internally by `stupidfastcount` & co) - can be used if you want to convert `$options` to an actual statement:
 
     ```php
     [

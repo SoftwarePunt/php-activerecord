@@ -555,6 +555,16 @@ class Model
 		$this->__dirty[$name] = true;
 	}
 
+    /**
+     * Flags all attributes as dirty.
+     */
+    public function flag_all_dirty(): void
+    {
+        foreach ($this->attributes as $name => $_) {
+            $this->__dirty[$name] = true;
+        }
+    }
+
 	/**
 	 * Removes attribute dirty flag.
 	 *
@@ -840,6 +850,9 @@ class Model
 
 		if (!($attributes = $this->dirty_attributes()))
 			$attributes = $this->attributes;
+
+        var_dump($this->dirty_attributes());
+        var_dump($attributes); exit;
 
 		$pk = $this->get_primary_key(true);
 		$use_sequence = false;
