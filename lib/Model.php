@@ -622,6 +622,15 @@ class Model
 		return $first ? $pk[0] : $pk;
 	}
 
+    /**
+     * Gets the (first) primary key value.
+     */
+    public function get_primary_key_value(): mixed
+    {
+        $pk = $this->get_primary_key(true);
+        return $this->attributes[$pk] ?? null;
+    }
+
 	/**
 	 * Returns the actual attribute name if $name is aliased.
 	 *
@@ -1313,6 +1322,65 @@ class Model
 
 		throw new RelationshipException("Relationship named $name has not been declared for class: {$table->class->getName()}");
 	}
+
+    /**
+     * Modifies a previously loaded relationship to add a given $model, if it is not already in the array (matched by PK).
+     * This does not cause any database writes, but rather modifies the local cache.
+     */
+    public function add_to_loaded_relationship(Model $model, string $name): void
+    {
+        $table = static::table();
+        $rel = $table->get_relationship($name, strict: true);
+
+        if (!$rel->is_poly()) {
+            throw new RelationshipException("Relationship named {$name} in class {$table->class->getName()} is not a poly relationship, cannot add item");
+        }
+
+        if (!array_key_exists($name, $this->__relationships)) {
+            // Relationship is not loaded
+            return;
+        }
+
+        $modelPk = $model->get_primary_key_value();
+
+        foreach ($this->__relationships[$name] as $item) {
+            /**
+             * @var Model $item
+             */
+            if ($item->get_primary_key_value() == $modelPk) {
+                // Already contained
+                return;
+            }
+        }
+
+        $this->__relationships[$name][] = $model;
+    }
+
+    /**
+     * Modifies a previously loaded relationship to remove a given $model, if it is in the array (matched by PK).
+     * This does not cause any database writes, but rather modifies the local cache.
+     */
+    public function remove_from_loaded_relationship(Model $model, string $name): void
+    {
+        $table = static::table();
+        $rel = $table->get_relationship($name, strict: true);
+
+        if (!$rel->is_poly()) {
+            throw new RelationshipException("Relationship named {$name} in class {$table->class->getName()} is not a poly relationship, cannot remove item");
+        }
+
+        if (!array_key_exists($name, $this->__relationships)) {
+            // Relationship is not loaded
+            return;
+        }
+
+        $modelPk = $model->get_primary_key_value();
+
+        $this->__relationships[$name] = array_values(array_filter(
+            $this->__relationships[$name],
+            fn (Model $item) => $item->get_primary_key_value() != $modelPk
+        ));
+    }
 
 	/**
 	 * Reloads the attributes and relationships of this object from the database.
