@@ -27,7 +27,7 @@ Because we do not actively maintain tags or versions for this project, you shoul
 
 ## Fork changes
 
-**This fork is currently only compatible with PHP 8.1!**
+**This fork is currently only compatible with PHP 8.1+ (Validated up to PHP 8.5)**
 
 ### Fixes
 
