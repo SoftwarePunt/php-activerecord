@@ -1593,12 +1593,10 @@ class Model
         $findQueryString = $findQueryInfo['query'];
         $findQueryValues = $findQueryInfo['values'];
 
-        // Execute the raw SQL and return result set row count
-        /**
-         * @var $query \PDOStatement
-         */
-        $query = self::connection()->query($findQueryString, $findQueryValues);
-        return count($query->fetchAll(\PDO::FETCH_COLUMN));
+        // Let the database count the rows, wrap subquery
+        $countQueryString = "SELECT COUNT(*) FROM ({$findQueryString}) AS stupidfastcount_subquery";
+
+        return intval(self::connection()->query_and_fetch_one($countQueryString, $findQueryValues));
     }
 
     public static function stupidfastquery(array $options)
