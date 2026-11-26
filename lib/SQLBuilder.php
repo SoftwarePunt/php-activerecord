@@ -278,7 +278,7 @@ class SQLBuilder
 	private function prepend_table_name_to_fields($hash=array())
 	{
 		$new = array();
-		$table = $this->connection->quote_name($this->table);
+		$table = $this->connection->quote_name($this->get_table_alias());
 
 		foreach ($hash as $key => $value)
 		{
@@ -324,8 +324,23 @@ class SQLBuilder
 		}
 	}
 
+	/**
+	 * Returns the name the table is referenced by in the query: its alias when one was given
+	 * (e.g. "users u" or "users AS u"), otherwise the table name itself.
+	 *
+	 * @return string
+	 */
+	private function get_table_alias()
+	{
+		$parts = preg_split('/\s+/', trim($this->table));
+		return end($parts);
+	}
+
 	private function build_delete()
 	{
+		if ($this->joins)
+			return $this->build_delete_with_joins();
+
 		$sql = "DELETE FROM $this->table";
 
 		if ($this->where)
@@ -339,6 +354,27 @@ class SQLBuilder
 			if ($this->limit)
 				$sql = $this->connection->limit($sql,null,$this->limit);
 		}
+
+		return $sql;
+	}
+
+	/**
+	 * Builds a multi-table DELETE that only removes rows from the primary table (MySQL syntax):
+	 * DELETE alias FROM table alias INNER JOIN ... WHERE ...
+	 */
+	private function build_delete_with_joins()
+	{
+		if (!$this->connection->accepts_joins_for_delete())
+			throw new ActiveRecordException('This database adapter does not support DELETE with joins.');
+
+		if ($this->order || $this->limit)
+			throw new ActiveRecordException('ORDER BY and LIMIT cannot be used in a DELETE with joins.');
+
+		$target = $this->get_table_alias();
+		$sql = "DELETE $target FROM $this->table $this->joins";
+
+		if ($this->where)
+			$sql .= " WHERE $this->where";
 
 		return $sql;
 	}

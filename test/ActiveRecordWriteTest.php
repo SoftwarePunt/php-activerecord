@@ -366,6 +366,22 @@ class ActiveRecordWriteTest extends DatabaseTest
 		$this->assert_true(strpos(Author::table()->last_sql, 'ORDER BY name asc LIMIT 1') !== false);
 	}
 
+	public function test_delete_all_with_from_and_joins()
+	{
+		if (!$this->conn->accepts_joins_for_delete())
+			$this->mark_test_skipped('Only MySQL accepts joins with DELETE operation');
+
+		$num_affected = Author::delete_all(array(
+			'from' => 'authors a',
+			'joins' => array('INNER JOIN books b ON b.author_id = a.author_id'),
+			'conditions' => array('b.name = ?', 'Ancient Art of Main Tanking')
+		));
+		$this->assert_equals(1, $num_affected);
+		$this->assert_sql_has('DELETE a FROM authors a INNER JOIN books b ON b.author_id = a.author_id WHERE b.name = ?', Author::table()->last_sql);
+		$this->assert_null(Author::find_by_author_id(1));
+		$this->assert_not_null(Book::find_by_name('Ancient Art of Main Tanking'));
+	}
+
 	public function test_update_all_with_set_as_string()
 	{
 		$num_affected = Author::update_all(array('set' => 'parent_author_id = 2'));

@@ -588,4 +588,15 @@ abstract class Connection
 		return false;
 	}
 
+	/**
+	 * Specifies whether or not adapter can use JOIN clauses with DELETE operations
+	 *
+	 * @internal
+	 * @returns boolean (FALSE by default)
+	 */
+	public function accepts_joins_for_delete()
+	{
+		return false;
+	}
+
 }

@@ -976,6 +976,8 @@ class Model
 	 *
 	 * <ul>
 	 * <li><b>conditions:</b> Conditions using a string/hash/array</li>
+	 * <li><b>from:</b> Table name, optionally with an alias (e.g. 'users u'); only rows from this table are deleted</li>
+	 * <li><b>joins:</b> Joins as a string or an array of JOIN fragments/relationship names (MySQL only; cannot be combined with limit/order)</li>
 	 * <li><b>limit:</b> Limit number of records to delete (MySQL & Sqlite only)</li>
 	 * <li><b>order:</b> A SQL fragment for ordering such as: 'name asc', 'id desc, name asc' (MySQL & Sqlite only)</li>
 	 * </ul>
@@ -987,7 +989,12 @@ class Model
 	{
 		$table = static::table();
 		$conn = static::connection();
-		$sql = new SQLBuilder($conn, $table->get_fully_qualified_table_name());
+		$from = is_array($options) && isset($options['from']) ? $options['from'] : $table->get_fully_qualified_table_name();
+		$sql = new SQLBuilder($conn, $from);
+
+		// joins must be applied before the conditions, so hash conditions get prefixed with the table name/alias
+		if (is_array($options) && !empty($options['joins']))
+			$sql->joins($table->create_joins($options['joins']));
 
 		$conditions = is_array($options) ? $options['conditions'] : $options;
 

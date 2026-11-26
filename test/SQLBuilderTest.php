@@ -205,6 +205,50 @@ class SQLBuilderTest extends DatabaseTest
 		$this->assert_sql_has("DELETE FROM authors WHERE id=? ORDER BY name asc LIMIT 1",$this->sql->to_s());
 	}
 
+	public function test_delete_with_joins()
+	{
+		if (!$this->conn->accepts_joins_for_delete())
+			$this->mark_test_skipped('Only MySQL accepts joins with DELETE operation');
+
+		$joins = 'INNER JOIN books b ON b.author_id = a.author_id';
+		$this->sql = new SQLBuilder($this->conn, 'authors a');
+		$this->sql->joins($joins);
+		$this->sql->delete('a.id = ? AND b.name IN(?)', 1, array('Ancient Art of Main Tanking', 'Another Book'));
+		$this->assert_sql_has("DELETE a FROM authors a $joins WHERE a.id = ? AND b.name IN(?,?)", $this->sql->to_s());
+		$this->assert_equals(array(1, 'Ancient Art of Main Tanking', 'Another Book'), $this->sql->bind_values());
+	}
+
+	public function test_delete_with_joins_without_alias()
+	{
+		if (!$this->conn->accepts_joins_for_delete())
+			$this->mark_test_skipped('Only MySQL accepts joins with DELETE operation');
+
+		$joins = 'INNER JOIN books ON books.author_id = authors.author_id';
+		$this->sql->joins($joins);
+		$this->sql->delete(array('id' => 1));
+		$this->assert_sql_has("DELETE authors FROM authors $joins WHERE authors.id=?", $this->sql->to_s());
+	}
+
+	public function test_delete_with_joins_and_limit_throws()
+	{
+		if (!$this->conn->accepts_joins_for_delete())
+			$this->mark_test_skipped('Only MySQL accepts joins with DELETE operation');
+
+		$this->expectException(\ActiveRecord\ActiveRecordException::class);
+		$this->sql->joins('INNER JOIN books ON books.author_id = authors.author_id');
+		$this->sql->delete(array('id' => 1))->limit(1);
+		$this->sql->to_s();
+	}
+
+	public function test_where_with_joins_and_alias_prepends_alias_to_fields()
+	{
+		$joins = 'INNER JOIN books b ON (b.id = a.id)';
+		$this->sql = new SQLBuilder($this->conn, 'authors a');
+		$this->sql->joins($joins);
+		$this->sql->where(array('id' => 1));
+		$this->assert_sql_has("SELECT * FROM authors a $joins WHERE a.id=?", (string)$this->sql);
+	}
+
 	public function test_reverse_order()
 	{
 		$this->assert_equals('id ASC, name DESC', SQLBuilder::reverse_order('id DESC, name ASC'));

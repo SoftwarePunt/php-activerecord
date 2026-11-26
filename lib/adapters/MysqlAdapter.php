@@ -78,6 +78,8 @@ class MysqlAdapter extends Connection
 
 	public function accepts_limit_and_order_for_update_and_delete() { return true; }
 
+	public function accepts_joins_for_delete() { return true; }
+
 	public function native_database_types()
 	{
 		return array(
